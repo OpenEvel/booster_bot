@@ -132,3 +132,6 @@ dmypy.json
 # IDE settings
 .vscode/
 .idea/
+
+# Файл настроек для pyrogram
+config.ini
