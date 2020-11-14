@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from bot_tlg.handlers import bot
+from bot_tlg.logic import bot
 class Command(BaseCommand):
     help = 'Запустить телеграм-бот'
 

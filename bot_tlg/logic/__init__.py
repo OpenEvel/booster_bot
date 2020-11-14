@@ -1,6 +1,6 @@
 from django.conf import settings
-from .models import Profile
-from .models import Message
+from ..models import Profile
+from ..models import Message
 import telebot
 
 bot = telebot.TeleBot(settings.TOKEN)
