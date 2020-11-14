@@ -36,3 +36,13 @@ class Message(models.Model):
     class Meta:
         verbose_name = 'Сообщение'
         verbose_name_plural= 'Сообщения'
+    
+class BotToken(models.Model):
+
+    token = models.TextField(
+        verbose_name='Токен'
+    )
+
+    class Meta:
+        verbose_name="Токен"
+        verbose_name_plural="Токены"
