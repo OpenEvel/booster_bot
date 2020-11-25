@@ -1,4 +1,4 @@
 aiogram
 pyTelegramBotAPI
 django
-python_dotenv
+python-dotenv
