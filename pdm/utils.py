@@ -9,6 +9,16 @@ from pathlib import Path
 MANAGERS_DIR = Path(__file__).resolve().parent
 # Директория проекта
 BASE_DIR = Path(__file__).resolve().parent.parent
+# Директория виртуально окружения 
+VENV_PATH = BASE_DIR / 'venv'
+# Системный интерпретатор python - глобальный
+G_PY_EXE = "python" if 'win' in sys.platform else 'python3'
+# Интерпретатор python из виртуального окружения
+VENV_PY_EXE = "venv\\Scripts\\python" if 'win' in sys.platform else "venv/bin/python"
+VENV_PY_EXE = BASE_DIR / VENV_PY_EXE
+# Утилита pip из виртуального окружения
+VENV_PIP = "venv\\Scripts\\pip" if 'win' in sys.platform else "venv/bin/pip"
+VENV_PIP = BASE_DIR / VENV_PIP
 
 
 def is_win():

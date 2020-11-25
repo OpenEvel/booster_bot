@@ -6,10 +6,12 @@ import secrets
 import dotenv
 
 from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-# Получаем директорию проекта
-BASE_DIR = Path(__file__).resolve().parent.parent
-ENV_PATH = BASE_DIR / ".env"
+from pdm import utils
+
+# Путь до настроок переменных окружения
+ENV_PATH = utils.BASE_DIR / ".env"
 
 def new_secret_key(count=50):
     """Создаёт новую строку секретного ключа"""

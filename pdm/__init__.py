@@ -18,6 +18,7 @@ def run_manager(python_exe, manager, *args):
     # Если есть аргументы, то добавляем их к комманде
     if str_args:
         command += ' ' + str_args
+    
     # запускаем комманду
     os.system(command)
 
@@ -29,15 +30,11 @@ def main():
     # Получаем в каком режиме была запущена утилита
     mode = argv[0]
 
-    # Системный интерпретатор python
-    python_global_exe = "python" if utils.is_win() else 'python3'
     # Устанавливаем нужные пакеты - зависимости, создаём виртуальное окружение
-    # run_manager(python_global_exe, 'package_manager.py')
-    
-    # Интерпретатор python из виртуального окружения, созданного на предыдущем шаге
-    python_exe = "venv\\Scripts\\python" if utils.is_win() else "venv/bin/python"
-    python_exe = utils.BASE_DIR / python_exe
+    # Причём используем системный интерпретатор python
+    run_manager(utils.G_PY_EXE, 'package_manager.py')
+
     # Устанавливаем переменные окружения для режима работы mode
-    run_manager(python_exe, 'env_manager.py', mode)
+    run_manager(utils.VENV_PY_EXE, 'env_manager.py', mode)
 
 __all__ = ['utils', 'main']
