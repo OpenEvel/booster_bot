@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
 import string
@@ -27,8 +28,7 @@ def main():
     argv = sys.argv[1:]
     
     if len(argv) == 0:
-        raise Exception("Пропущены аргументы при использвании env_manager")
-
+        print("Пропущены аргументы при использвании env_manager")
     # Получаем в каком режиме была запущена утилита
     mode = argv[0]
     
