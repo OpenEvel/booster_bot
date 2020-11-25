@@ -1,4 +1,0 @@
-pylint
-pyrogram
-tgcrypto
-django
