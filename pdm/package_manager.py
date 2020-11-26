@@ -8,6 +8,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from pdm import utils
 
 def main():
+    print('package manager:')
     # Создаём виртуальное окружение
     utils.status_bar("making 'venv' directory", 
                      command=f"{utils.G_PY_EXE} -m venv {utils.VENV_PATH}")

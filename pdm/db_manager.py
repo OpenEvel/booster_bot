@@ -14,15 +14,25 @@ from django.conf import settings
 # Получаем путь до базы данных
 DB_PATH = settings.DATABASES['default']['NAME']
 
+def make_migrate():
+    """Создаёт нужные миграции, обновляет DB"""
+    # Обновляем миграции
+    utils.status_bar('updating migrations for DB',
+                      command = f'{utils.VENV_PY_EXE} {utils.BASE_DIR / "manage.py"} makemigrations')
+
+    # Создаём нужные миграции
+    utils.status_bar('make migrations for DB', 
+                     command = f'{utils.VENV_PY_EXE} {utils.BASE_DIR / "manage.py"} migrate')
+
 def main():
     # Если база данных существует
     if os.path.exists(DB_PATH):
         # то удаляем её
         os.remove(DB_PATH)
 
-    # Создаём нужные миграции
-    utils.status_bar('make migrations for DB', 
-                     command = f'{utils.VENV_PY_EXE} {utils.BASE_DIR / "manage.py"} migrate')
+    print('datebase manager:')
+    # Создаём нужные миграции в базе данных
+    make_migrate()
     
     # Создаём супер пользователя
     os.system(f'{utils.VENV_PY_EXE} {utils.BASE_DIR / "manage.py"} createsuperuser')
