@@ -52,6 +52,11 @@ class TlgBot(models.Model):
         verbose_name='Токен'
     )
 
+    state = models.TextField(
+        verbose_name='Состояние',
+        default = 'off',
+    )
+
     class Meta:
         verbose_name="Телеграм бот"
         verbose_name_plural="Телеграм боты"

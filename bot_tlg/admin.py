@@ -16,4 +16,4 @@ class MessageAdmin(admin.ModelAdmin):
 
 @admin.register(TlgBot)
 class BotTokenAdmin(admin.ModelAdmin):
-    list_display=('username', 'external_id', 'token')
+    list_display=('username', 'state', 'external_id', 'token')
