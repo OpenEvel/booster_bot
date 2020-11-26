@@ -1,37 +1,46 @@
-from django.conf import settings
+import os
+from aiogram import types
+from asgiref.sync import sync_to_async
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+
 from ..models import Profile
 from ..models import Message
-from aiogram import Dispatcher, Bot, types
-import telebot
+from ..models import TlgBot
 
-# bot = telebot.TeleBot(settings.TOKEN)
+async def get_bot(bot_id):
+    get_table_bot = lambda : TlgBot.objects.get(external_id=bot_id)
+    table_bot = await sync_to_async(get_table_bot)()
+    return table_bot
 
-class BotsDispathcer(Bot):
-    all = []
+async def on(message: types.Message):
+    bot_id = message.bot.id
+    table_bot = await get_bot(bot_id)
+    table_bot.state = "on"
+    await sync_to_async(table_bot.save)()
 
-    def __init__(self, *args, **kargs):
-        # Добавляем этот диспетчер в список всех диспетчеров
-        BotsDispathcer.all.append(self)
-        super().__init__(self, *args, **kargs)
-    
-    @classmethod
-    def message_handler_lol(cls, *custom_filters, commands=None, regexp=None, content_types=None, state=None,
-                        run_task=None, **kwargs):
-        def decorator(callback):
-            for dp in BotsDispathcer.all:
-                dp.register_message_handler(callback, *custom_filters,
-                                          commands=commands, regexp=regexp, content_types=content_types,
-                                          state=state, run_task=run_task, **kwargs)
-            return callback
+async def off(message: types.Message):
+    bot_id = message.bot.id
+    table_bot = await get_bot(bot_id)
+    table_bot.state = "off"
+    await sync_to_async(table_bot.save)()
 
-        return decorator
+async def status(message: types.Message):
+    bot_id = message.bot.id
+    table_bot = await get_bot(bot_id)
+    if table_bot.state == 'off':
+        await message.answer('Бот в состоянии "off"')
+    else:
+        await message.answer('Бот в состоянии "on"')
 
+async def run(message: types.Message):
+    bot_id = message.bot.id
+    table_bot = await get_bot(bot_id)
+    if table_bot.state == 'off':
+        await message.answer('Иди нахуй я ливаю')
+        os._exit(0)
+    else:
+        await message.answer('Ещё побуду здесь')
 
-@BotsDispathcer.message_handler_lol()
-async def cmd(message: types.Message):
-    chat_id = message.chat.id
-    text = message.text
-    print(text)
 
 # def cmd(message):
 #     chat_id = message.chat.id

@@ -1,28 +1,44 @@
 from django.core.management.base import BaseCommand
-from bot_tlg.logic import BotsDispathcer
+from bot_tlg import logic
 from bot_tlg.models import TlgBot
-from aiogram import Bot, executor, Dispatcher
-import asyncio
+from aiogram import Bot, executor, Dispatcher, types
 
-def main():
-    all_bots = TlgBot.objects.all()
-    for bot in all_bots:
-        b = Bot(bot.token)
-        # dp = BotsDispathcer(b)
-        # executor.start_polling(dp, skip_updates=True)
-
-async def lol(TOKEN):
-    bot = Bot(TOKEN)
+async def on_startup(dp):
+    bot = dp.bot
     try:
         me = await bot.get_me()
         print(f'{me.username} запущен')
-    finally:
-        await bot.close()
+    except:
+        pass
+
+def star_bot(token):
+    bot = Bot(token)
+    dp = Dispatcher(bot)
+
+    dp.register_message_handler(logic.on, commands=['on'])
+    dp.register_message_handler(logic.off, commands=['off'])
+    dp.register_message_handler(logic.status, commands=['status'])
+    dp.register_message_handler(logic.run, commands=['run'])
+
+    @dp.message_handler()
+    async def cmd(message: types.Message):
+        await message.answer(message.text)
+
+    executor.start_polling(dp, on_startup=on_startup, skip_updates=True)
 
 
 class Command(BaseCommand):
     help = 'Запустить телеграм-бот'
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            nargs='+',
+            type=int,
+            dest = 'args'
+        )
+
     def handle(self, *args, **options):
-        TOKEN = TlgBot.objects.all()[0].token
-        asyncio.run(lol(TOKEN))
+        if len(args) > 0:
+            bot_pk = args[0]
+            bot = TlgBot.objects.get(pk=bot_pk)
+            star_bot(bot.token)
