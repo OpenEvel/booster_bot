@@ -3,7 +3,7 @@ from django.contrib import admin
 from .forms import ProfileForm
 from .models import Profile
 from .models import Message
-from .models import BotToken
+from .models import TlgBot
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
@@ -14,6 +14,6 @@ class ProfileAdmin(admin.ModelAdmin):
 class MessageAdmin(admin.ModelAdmin):
     list_display=('id', 'profile', 'text', 'created_at')
 
-@admin.register(BotToken)
+@admin.register(TlgBot)
 class BotTokenAdmin(admin.ModelAdmin):
-    list_display=('id', 'token')
+    list_display=('username', 'external_id', 'token')

@@ -37,12 +37,21 @@ class Message(models.Model):
         verbose_name = 'Сообщение'
         verbose_name_plural= 'Сообщения'
     
-class BotToken(models.Model):
+class TlgBot(models.Model):
 
+    username = models.TextField(
+        verbose_name='Логин'
+    )
+
+    external_id = models.PositiveIntegerField(
+        verbose_name="ID бота в телеграме",
+        unique=True,
+    )
+    
     token = models.TextField(
         verbose_name='Токен'
     )
 
     class Meta:
-        verbose_name="Токен"
-        verbose_name_plural="Токены"
+        verbose_name="Телеграм бот"
+        verbose_name_plural="Телеграм боты"
