@@ -37,4 +37,7 @@ def main():
     # Устанавливаем переменные окружения для режима работы mode
     run_manager(utils.VENV_PY_EXE, 'env_manager.py', mode)
 
+    # Настраиваем базу данных
+    run_manager(utils.VENV_PY_EXE, 'db_manager.py')
+
 __all__ = ['utils', 'main']

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Менеджер для установки пакетов-зависимостей"""
 import os
 import sys
 from pathlib import Path

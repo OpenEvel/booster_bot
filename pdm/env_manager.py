@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Менеджер для настройки переменных среды"""
 import os
 import sys
 import string
