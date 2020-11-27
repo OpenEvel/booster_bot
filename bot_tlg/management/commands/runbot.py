@@ -37,7 +37,7 @@ async def on_startup(dp):
     # Выводим сообщение
     bot = dp.bot
     me = await bot.get_me()
-    print(f'{me.username} запущен')
+    print(f'{me.username} {me.id} запущен')
 
     # Записываем в базу, что бот включён
     table_bot = await logic.get_bot(bot.id)
