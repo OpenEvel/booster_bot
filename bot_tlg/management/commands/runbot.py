@@ -1,11 +1,19 @@
 import os
+import sys
 import asyncio
+import subprocess
+from pathlib import Path
 from django.core.management.base import BaseCommand
 from aiogram import Bot, executor, Dispatcher, types
 from asgiref.sync import sync_to_async
 
 from bot_tlg import logic
 from bot_tlg.models import TlgBot
+
+BASE_DIR = Path(__file__).parent.parent.parent.parent
+# Интерпретатор python из виртуального окружения
+VENV_PY_EXE = "venv\\Scripts\\python" if 'win' in sys.platform else "venv/bin/python"
+VENV_PY_EXE = BASE_DIR / VENV_PY_EXE
 
 async def period_check_state(dp):
     """Пероидически проверяет состояние бота"""
@@ -38,8 +46,9 @@ def register_handlers(dp):
     dp.register_message_handler(logic.status, commands=['status'])
     dp.register_message_handler(logic.run, commands=['run'])
 
-def start_bot(token):
-    bot = Bot(token)
+def start_bot(bot_pk):
+    table_bot = TlgBot.objects.get(pk=bot_pk)
+    bot = Bot(table_bot.token)
     dp = Dispatcher(bot)
 
     # регестрируем нужные обработчики
@@ -49,22 +58,59 @@ def start_bot(token):
     async def cmd(message: types.Message):
         await message.answer(message.text)
 
-    executor.start_polling(dp, on_startup=on_startup, skip_updates=True)
+    executor.start_polling(dp, on_startup=on_startup)
+
+def bot_at_proc(*args):
+    """Запуск бота в отдельном процессе"""
+    runner = BASE_DIR / 'manage.py'
+    command = f'{VENV_PY_EXE} {runner} runbot'
+    # Собираем все позиционные аргументы в строку
+    str_args = ' '.join(str(x) for x in args)
+    if str_args:
+        command += ' ' + str_args
+    # Запускам бота в отдельном процессе
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
+    return proc
 
 
 class Command(BaseCommand):
     help = 'Запустить телеграм-бот'
 
     def add_arguments(self, parser):
+        # Добавляем опцию - запустить в отдельном процессе
         parser.add_argument(
-            nargs='+',
+            '-p', 
+            '--process',
+            action='store_true', 
+            default=False,
+            help='Запуск в отдельном процессе'
+        )
+
+        # Добавляем позиционный параметр - запустить бота по его 
+        # primary key в базе данных
+        parser.add_argument(
+            nargs='*',
             type=int,
-            dest = 'args'
+            dest='args'
         )
 
     def handle(self, *args, **options):
-        if len(args) > 0:
+        if options['process']:
+            # Запускаем ОДНОГО бота в отдельном процессе
+            bot_at_proc(*args)
+        elif len(args) == 1:
+            # Запускаем бота в ЭТОМ процессе
             bot_pk = args[0]
-            bot = TlgBot.objects.get(pk=bot_pk)
-            start_bot(bot.token)
+            start_bot(bot_pk)
+        elif len(args) > 1:
+            # Запускаем всех ботов из списка args
+            for bot_pk in args:
+                bot_at_proc(bot_pk)
+        else:
+            # Не было передано никаких параметров
+            # Запускаем всех ВЫКЛЮЧЕННЫХ ботов из базы данных
+            print('Запускаю всех выключенных ботов')
+            for bot in TlgBot.objects.filter(state='off'):
+                bot_at_proc(bot.pk)
+
 
