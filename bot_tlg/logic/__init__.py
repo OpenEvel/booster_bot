@@ -1,7 +1,6 @@
 import os
 from aiogram import types
 from asgiref.sync import sync_to_async
-os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 from ..models import Profile
 from ..models import Message

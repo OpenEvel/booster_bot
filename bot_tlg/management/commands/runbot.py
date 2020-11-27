@@ -1,24 +1,49 @@
+import os
+import asyncio
 from django.core.management.base import BaseCommand
+from aiogram import Bot, executor, Dispatcher, types
+from asgiref.sync import sync_to_async
+
 from bot_tlg import logic
 from bot_tlg.models import TlgBot
-from aiogram import Bot, executor, Dispatcher, types
+
+async def period_check_state(dp):
+    """Пероидически проверяет состояние бота"""
+    while True:
+        bot = dp.bot
+        table_bot = await logic.get_bot(bot.id)
+        if table_bot.state == 'off':
+            os._exit(0)
+        await asyncio.sleep(2)
 
 async def on_startup(dp):
+    """При запуске бота"""
+
+    # Выводим сообщение
     bot = dp.bot
-    try:
-        me = await bot.get_me()
-        print(f'{me.username} запущен')
-    except:
-        pass
+    me = await bot.get_me()
+    print(f'{me.username} запущен')
 
-def star_bot(token):
-    bot = Bot(token)
-    dp = Dispatcher(bot)
+    # Записываем в базу, что бот включён
+    table_bot = await logic.get_bot(bot.id)
+    table_bot.state = "on"
+    await sync_to_async(table_bot.save)()
 
+    asyncio.create_task(period_check_state(dp))
+
+def register_handlers(dp):
+    """Регестрируем все нужные обработчики сообщений"""
     dp.register_message_handler(logic.on, commands=['on'])
     dp.register_message_handler(logic.off, commands=['off'])
     dp.register_message_handler(logic.status, commands=['status'])
     dp.register_message_handler(logic.run, commands=['run'])
+
+def start_bot(token):
+    bot = Bot(token)
+    dp = Dispatcher(bot)
+
+    # регестрируем нужные обработчики
+    register_handlers(dp)
 
     @dp.message_handler()
     async def cmd(message: types.Message):
@@ -41,4 +66,5 @@ class Command(BaseCommand):
         if len(args) > 0:
             bot_pk = args[0]
             bot = TlgBot.objects.get(pk=bot_pk)
-            star_bot(bot.token)
+            start_bot(bot.token)
+
