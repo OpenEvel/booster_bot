@@ -19,7 +19,14 @@ async def period_check_state(dp):
     """Пероидически проверяет состояние бота"""
     while True:
         bot = dp.bot
-        table_bot = await logic.get_bot(bot.id)
+        try:
+            table_bot = await logic.get_bot(bot.id)
+        except TlgBot.DoesNotExist:
+            # Мы попоали в исключение, значит такого бота нет в таблице
+            # Поэтому просто завершаем процесс
+            os._exit(0)
+
+        # Бот есть в базе, смотрим его состояние
         if table_bot.state == 'off':
             os._exit(0)
         await asyncio.sleep(2)
