@@ -6,8 +6,8 @@ from ..models import Profile
 from ..models import Message
 from ..models import TlgBot
 
-async def get_bot(bot_id):
-    get_table_bot = lambda : TlgBot.objects.get(external_id=bot_id)
+async def get_bot(external_id):
+    get_table_bot = lambda : TlgBot.objects.get(external_id=external_id)
     table_bot = await sync_to_async(get_table_bot)()
     return table_bot
 

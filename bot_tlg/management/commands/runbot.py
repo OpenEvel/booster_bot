@@ -20,7 +20,7 @@ async def period_check_state(dp):
     while True:
         bot = dp.bot
         try:
-            table_bot = await logic.get_bot(bot.id)
+            table_bot = await logic.get_bot(external_id=bot.id)
         except TlgBot.DoesNotExist:
             # Мы попоали в исключение, значит такого бота нет в таблице
             # Поэтому просто завершаем процесс
@@ -40,10 +40,11 @@ async def on_startup(dp):
     print(f'{me.username} {me.id} запущен')
 
     # Записываем в базу, что бот включён
-    table_bot = await logic.get_bot(bot.id)
+    table_bot = await logic.get_bot(external_id=bot.id)
     table_bot.state = "on"
     await sync_to_async(table_bot.save)()
 
+    # включаем периодическую проверку состояния бота (off/on)
     asyncio.create_task(period_check_state(dp))
 
 def register_handlers(dp):
